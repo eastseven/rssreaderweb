@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="rss feed list">
+    <meta name="author" content="eastseven">
+    <title><%= title %></title>
+    
+    <!-- CSS -->
+    <link href="stylesheets/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+
+      /* Sticky footer styles
+      -------------------------------------------------- */
+
+      html,
+      body {
+        height: 100%;
+        /* The html and body elements cannot have any padding or margin. */
+      }
+
+      /* Wrapper for page content to push down footer */
+      #wrap {
+        min-height: 100%;
+        height: auto !important;
+        height: 100%;
+        /* Negative indent footer by it's height */
+        margin: 0 auto -60px;
+      }
+
+      /* Set the fixed height of the footer here */
+      #push,
+      #footer {
+        height: 60px;
+      }
+      #footer {
+        background-color: #f5f5f5;
+      }
+
+      /* Lastly, apply responsive CSS fixes as necessary */
+      @media (max-width: 767px) {
+        #footer {
+          margin-left: -20px;
+          margin-right: -20px;
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }
+
+
+
+      /* Custom page CSS
+      -------------------------------------------------- */
+      /* Not required for template or sticky footer method. */
+
+      .container {
+        width: auto;
+        max-width: 680px;
+      }
+      .container .credit {
+        margin: 20px 0;
+      }
+
+    </style>
+    <link href="stylesheets/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="images/favicon.png">
+  </head>
+  <body>
+    
+    <!-- Part 1: Wrap all page content here -->
+    <div id="wrap">
+
+      <!-- Begin page content -->
+      <div class="container">
+        <div class="page-header">
+          <h1><%= title %></h1>
+        </div>
+        
+        <form id='create' action="/create" method="post" accept-charset="utf-8" style="text-align: center;">
+	        <div class="input-prepend">
+	          <button class="btn" type="button" id="add">添加</button>
+	        	<input class="input-xxlarge" type="text" placeholder="RSS Fedd URL" name="rssFeedUri" id="rssFeedUri" value=""/>
+	        </div>
+      	</form>
+      	<!--<div class="well well-small">
+      		<button class="close" name="del" >&times;</button>
+      		<p style="font-size: 16px;">XXXXXXXXXXX</p>
+      		<p><small><em>2013-05-28 12:34:56</em></small></p>
+      	</div>-->
+      	<%
+      	  rssFeeds.forEach(function(feed) {
+      	  	%><div class="well well-small">
+      		<button class="close" name="del" data="<%= feed._id %>">&times;</button>
+      		<p style="font-size: 16px;"><%= feed.uri %></p>
+      		<p><small><em><%= feed.create_time.toLocaleString() %></em></small></p>
+      		</div><%
+      	  });
+      	%>
+      </div>
+
+      <!-- Modal -->
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-body">
+        <p>请填写RSS URL</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+      </div>
+    </div>
+
+      <div id="push"></div>
+    </div>
+
+    <div id="footer">
+      <div class="container">
+        <p class="muted credit">Example courtesy <a href="http://martinbean.co.uk">Martin Bean</a> and <a href="http://ryanfait.com/sticky-footer/">Ryan Fait</a>.</p>
+      </div>
+    </div>
+
+
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!--<script src="http://code.jquery.com/jquery.js"></script>-->
+    <script src="javascripts/jquery.js"></script>
+    <script src="javascripts/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+      	$('#add').on('click', function() {
+      		var uri = $('#rssFeedUri').val();
+      		if(uri == '') {
+      			$('#myModal').modal('show');
+      		} else {
+      			console.log('uri: ', uri);
+      			$('#create').submit();
+      		}
+      	});
+
+
+      	$('button[name=del]').each(function() {
+      		$(this).on('click', function() {
+      			var div = $(this).parent();
+      			var id = $(this).attr('data');
+      			var url = '/delete/'+id;
+      			$.getJSON(url, function(data) {
+      				if(data.success) div.remove();
+      			});
+      		});
+      	});
+      });
+    </script>
+  </body>
+</html>
